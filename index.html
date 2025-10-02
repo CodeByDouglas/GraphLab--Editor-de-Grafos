@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GraphFlow - Editor de Grafos</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="img/icone_pagina.png">
+</head>
+<body>
+    
+    <header class="header">
+        <div class="header-left">
+            <button class="menu-btn" id="menuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="logo">
+                <img src="img/logo.png" alt="Logo" class="logo-img">
+            </div>
+        </div>
+        
+        <div class="header-center">
+            <div class="file-name">
+                <input type="text" value="Grafo sem título" id="fileName">
+                <i class="fas fa-pen"></i>
+            </div>
+        </div>
+        
+        <div class="header-right">
+            <button class="btn-icon" id="zoomOutBtn" title="Diminuir zoom">
+                <i class="fas fa-search-minus"></i>
+            </button>
+            <span class="zoom-level" id="zoomLevel">100%</span>
+            <button class="btn-icon" id="zoomInBtn" title="Aumentar zoom">
+                <i class="fas fa-search-plus"></i>
+            </button>
+            <button class="btn-icon" id="resetZoomBtn" title="Resetar zoom">
+                <i class="fas fa-compress"></i>
+            </button>
+            <div class="separator"></div>
+            <button class="btn-primary" id="exportBtn">
+                <i class="fas fa-download"></i>
+                <span>Exportar</span>
+            </button>
+        </div>
+    </header>
+
+    
+    <div class="main-container">
+        
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-section">
+                <h3>Arquivo</h3>
+                <button class="sidebar-btn" id="newFileBtn">
+                    <i class="fas fa-circle-plus"></i>
+                    <span>Novo</span>
+                </button>
+                <button class="sidebar-btn" id="openFileBtn">
+                    <i class="fas fa-folder-open"></i>
+                    <span>Abrir</span>
+                </button>
+                <button class="sidebar-btn" id="saveBtn">
+                    <i class="fas fa-save"></i>
+                    <span>Salvar</span>
+                </button>
+            </div>
+
+            <div class="sidebar-section">
+                <h3><i class="fas fa-route"></i> Menor caminho</h3>
+                <div class="dijkstra-result hidden" id="dijkstraResult"></div>
+                <div class="dijkstra-form">
+                    <label for="dijkstraStart">Vértice inicial</label>
+                    <input type="text" id="dijkstraStart" placeholder="Nome ou ID">
+                    <label for="dijkstraEnd">Vértice final</label>
+                    <input type="text" id="dijkstraEnd" placeholder="Nome ou ID">
+                    <button class="sidebar-btn" id="runDijkstraBtn">
+                        <i class="fas fa-route"></i>
+                        <span>Calcular</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>Propriedades</h3>
+                <div class="properties-panel" id="propertiesPanel">
+                    <p class="empty-state">Selecione um elemento para ver suas propriedades</p>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3>Estatísticas</h3>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Nós:</span>
+                        <span class="stat-value" id="nodeCount">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Arestas:</span>
+                        <span class="stat-value" id="edgeCount">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Componentes:</span>
+                        <span class="stat-value" id="componentCount">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>Estilo</h3>
+                <div class="color-picker-wrapper">
+                    <label for="nodeColorPicker">Cor do vértice</label>
+                    <input type="color" id="nodeColorPicker" value="#0A84FF">
+                </div>
+                <div class="color-picker-wrapper">
+                    <label for="edgeColorPicker">Cor da aresta</label>
+                    <input type="color" id="edgeColorPicker" value="#2E2E2E">
+                </div>
+            </div>
+        </aside>
+
+       
+        <div class="canvas-container">
+            <div id="graphCanvas"></div>
+            
+            <div class="bottom-toolbar">
+                <button class="toolbar-btn" data-tool="conectar" title="Conectar vértices (C)">
+                    <i class="fas fa-link"></i>
+                </button>
+                <button class="toolbar-btn active" data-tool="mover" title="Mover vértices (M)">
+                    <i class="fas fa-up-down-left-right"></i>
+                </button>
+                <button class="toolbar-btn" data-action="adicionar-vertice" title="Adicionar vértice no centro (A)">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button class="toolbar-btn" data-action="arestas-aleatorias" title="Gerar arestas aleatórias (R)">
+                    <i class="fas fa-shuffle"></i>
+                </button>
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn" data-tool="apagar" title="Apagar vértices/arestas (Del)">
+                    <i class="fas fa-eraser"></i>
+                </button>
+            </div>
+            
+            
+            <div class="context-menu" id="contextMenu">
+                <button class="context-menu-item" id="duplicateBtn">
+                    <i class="fas fa-copy"></i>
+                    <span>Duplicar</span>
+                </button>
+                <button class="context-menu-item" id="deleteContextBtn">
+                    <i class="fas fa-trash"></i>
+                    <span>Deletar</span>
+                </button>
+            </div>
+            
+            
+            <div class="help-panel">
+                <button class="help-toggle" id="helpToggle">
+                    <i class="fas fa-question-circle"></i>
+                </button>
+                <div class="help-content" id="helpContent">
+                    <h4>Atalhos</h4>
+                    <div class="shortcut">
+                        <span class="key">Del</span>
+                        <span>Apagar vértices/arestas</span>
+                    </div>
+                    <div class="shortcut">
+                        <span class="key">X</span>
+                        <span>Ativar borracha</span>
+                    </div>
+                    <div class="shortcut">
+                        <span class="key">M</span>
+                        <span>Mover vértices</span>
+                    </div>
+                    <div class="shortcut">
+                        <span class="key">C</span>
+                        <span>Conectar vértices</span>
+                    </div>
+                    <div class="shortcut">
+                        <span class="key">A</span>
+                        <span>Adicionar vértice</span>
+                    </div>
+                    <div class="shortcut">
+                        <span class="key">R</span>
+                        <span>Gerar arestas aleatórias</span>
+                    </div>
+                    <div class="shortcut">
+                        <span class="key">Ctrl+Z</span>
+                        <span>Desfazer</span>
+                    </div>
+                    <div class="shortcut">
+                        <span class="key">Ctrl+Y</span>
+                        <span>Refazer</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="modal" id="exportModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Exportar Grafo</h2>
+                <button class="modal-close" id="closeExportModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="export-options">
+                    <button class="export-option" data-format="png">
+                        <i class="fas fa-image"></i>
+                        <span>PNG</span>
+                    </button>
+                    <button class="export-option" data-format="svg">
+                        <i class="fas fa-vector-square"></i>
+                        <span>SVG</span>
+                    </button>
+                    <button class="export-option" data-format="json">
+                        <i class="fas fa-code"></i>
+                        <span>JSON</span>
+                    </button>
+                    <button class="export-option" data-format="adjacency">
+                        <i class="fas fa-table"></i>
+                        <span>Matriz de Adjacência</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <input type="file" id="fileInput" accept=".json" style="display: none;">
+
+    
+    <div class="dialog-overlay hidden" id="dialogOverlay">
+        <div class="dialog-panel">
+            <h2 class="dialog-title" id="dialogTitle">Título</h2>
+            <p class="dialog-message" id="dialogMessage"></p>
+            <div class="dialog-input hidden" id="dialogInputWrapper">
+                <input type="text" id="dialogInput" />
+            </div>
+            <div class="dialog-actions">
+                <button class="dialog-button dialog-cancel" id="dialogCancelBtn">Cancelar</button>
+                <button class="dialog-button dialog-confirm" id="dialogConfirmBtn">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.x/dist/pixi.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+    <script type="module" src="app.js"></script>
+</body>
+</html>

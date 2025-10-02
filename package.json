@@ -1,0 +1,26 @@
+{
+  "name": "graphflow-editor",
+  "version": "1.0.0",
+  "description": "Editor de grafos",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8000 || python -m SimpleHTTPServer 8000",
+    "serve": "npx live-server --port=8000"
+  },
+  "keywords": [
+    "graph",
+    "editor",
+    "visualization",
+    "pixijs",
+    "interactive"
+  ],
+  "author": "Douglas e João",
+  "license": "MIT",
+  "dependencies": {
+    "pixi.js": "^7.3.2"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}
+
